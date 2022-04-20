@@ -2,6 +2,7 @@ library(purrr)
 library(tidyverse)
 library(readxl)
 library(writexl)
+library(adagio)
 
 setwd("~/current work/01_R_Projects/02_Blocking/FC_SHEETS")
 file.list <- list.files(getwd(),pattern='.xls', recursive = TRUE)
@@ -45,12 +46,30 @@ transmute( DATE = as.numeric(...16),
     SHEET = as.character(...14),  
     SAMPLE_ID = as.numeric(...1),
          LEVEL = as.numeric(...15),
-          FROM = as.numeric(...2),
-          TO = as.numeric(...3),
-          LENGTH = as.numeric(...4),
-          AU_gpt = as.numeric(SURVEY),
-          AG_gpt = as.numeric(...7),
-          CU_perc = as.numeric (...8),
-          PB_perc = as.numeric(...9),
-          ZN_perc = as.numeric (...10))
+          FROM = round(as.numeric(...2),2),
+          TO = round(as.numeric(...3),2),
+          LENGTH = round(as.numeric(...4),2),
+          AU_gpt = round(as.numeric(SURVEY),2),
+          AG_gpt = round(as.numeric(...7),2),
+          CU_perc = round(as.numeric (...8),2),
+          PB_perc = round(as.numeric(...9),2),
+          ZN_perc = round(as.numeric (...10),2),
+          W_AU = AU_gpt * LENGTH,
+    MV = as.character(NA)) 
 
+df_3 <- df_2 %>% 
+  filter(!is.na(W_AU),
+         !is.na(FROM))
+
+MV_TXG <- (as.numeric(df[28,3])* as.numeric(df[28,5])) 
+
+
+a <- df_3["W_AU"] %>%
+  filter(W_AU <= MV_TXG) %>% as_vector()
+
+a <- a * 10000
+MV_TXG <- MV_TXG * 10000
+
+sol <- subsetsum(a,MV_TXG)
+j <- sol["inds"] %>% unlist()
+df_3[j,"MV"] <- "MV" 
