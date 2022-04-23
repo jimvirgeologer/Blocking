@@ -3,15 +3,16 @@ library(tidyverse)
 library(readxl)
 library(writexl)
 library(adagio)
-
+library(dplyr)
+library(MASS)
+###########DATA BASE###############
 setwd("~/current work/01_R_Projects/02_Blocking/FC_SHEETS")
 file.list <- list.files(getwd(),pattern='.xls', recursive = TRUE)
+file.list <- file.list[!grepl("000",file.list)]
 
-# df <- lapply(file.list, function(i){
-#   x = read_xls(i, sheet = 1)
-# }) %>% bind_rows %>% as.data.frame()
+# txt_paths <- vec[grepl(".txt$", vec)]
 
-
+########### READ EXCEL ############3
 Face_Sheet <- function(i){
   x = read_xls(i, sheet = 1)
   x[,22] <- x[3,15]
@@ -19,57 +20,60 @@ Face_Sheet <- function(i){
   x[,24] <- x[52,4]
   x[,25] <- as.numeric(x[29,5]) * as.numeric(x[29,7])
   x[,26] <- ""
-  VWG <- as.numeric(x[29,5]) * as.numeric(x[29,7])
-  for(j in 10:16) {
-    x[j,26] <- if((0.517)%%VWG==0) {
-      "mv" } else {
-        ""
-      }
-    }
- 
   x <- x[-6,]
   x <- x[,-c(1:2,16:21)]
-  return(x)
+  colnames(x) <- c("c1","c2","c3","c4","c5","c6","c7","c8","c9","c10","c11","c12","c13","c14","c15","c16","c17","c18")
+  
+  MV_TXG <- as.numeric(x[28,3])* as.numeric(x[28,5])
+  
+  x <- x %>% transmute( SHEET = as.character(c14),
+                        DATE = as.numeric(c16),
+                        DATE = as.Date(DATE, origin = "1899-12-30"),
+                        SAMPLE_ID = as.numeric(c1),
+                        LEVEL = as.numeric(c15),
+                        FROM = round(as.numeric(c2),2),
+                        TO = round(as.numeric(c3),2),
+                        LENGTH = as.numeric(c4),
+                        AU_gpt = as.numeric(c6),
+                        AG_gpt = round(as.numeric(c7),2),
+                        CU_perc = round(as.numeric (c8),2),
+                        PB_perc = round(as.numeric(c9),2),
+                        ZN_perc = round(as.numeric (c10),2),
+                        W_AU = AU_gpt * LENGTH,
+                        MV = as.character(NA)) %>%
+    filter(!is.na(W_AU),
+      !is.na(FROM),
+      W_AU !=0)
+  
+  
+S <- as.integer(unlist(x["W_AU"] * 10000))
+t <- as.integer(MV_TXG * 10000 )
+
+t <- ifelse(t <= 0 ,2, t) %>% as.integer()
+S <- ifelse(S > t , t - 1, S) %>% as.integer()
+S <- ifelse(S <1 , 1, S) %>% as.integer()
+  
+########## Sub set sum #############
+# sol <- subsetsum(S,t)
+# j <- sol["inds"] %>% unlist()
+# x[j,"MV"] <- "MV"
+
+######### Return Vaues ########
+a <- is.integer(S) %>% as.data.frame()
+b <- is.integer(t) %>% as.data.frame()
+d <-  S < t
+S <- S %>% as.data.frame()
+final <- cbind(S,a,t,b,d,x)
+return(final)
+
 }
 
 
 df <- lapply(file.list, Face_Sheet) %>%
-  bind_rows %>%
-  as.data.frame()
+bind_rows %>%
+as.data.frame()
 
 
+vis_miss(df)
 
-
-df_2 <- df %>%
-transmute( DATE = as.numeric(...16),
-    DATE = as.Date(DATE, origin = "1899-12-30"),
-    SHEET = as.character(...14),  
-    SAMPLE_ID = as.numeric(...1),
-         LEVEL = as.numeric(...15),
-          FROM = round(as.numeric(...2),2),
-          TO = round(as.numeric(...3),2),
-          LENGTH = round(as.numeric(...4),2),
-          AU_gpt = round(as.numeric(SURVEY),2),
-          AG_gpt = round(as.numeric(...7),2),
-          CU_perc = round(as.numeric (...8),2),
-          PB_perc = round(as.numeric(...9),2),
-          ZN_perc = round(as.numeric (...10),2),
-          W_AU = AU_gpt * LENGTH,
-    MV = as.character(NA)) 
-
-df_3 <- df_2 %>% 
-  filter(!is.na(W_AU),
-         !is.na(FROM))
-
-MV_TXG <- (as.numeric(df[28,3])* as.numeric(df[28,5])) 
-
-
-a <- df_3["W_AU"] %>%
-  filter(W_AU <= MV_TXG) %>% as_vector()
-
-a <- a * 10000
-MV_TXG <- MV_TXG * 10000
-
-sol <- subsetsum(a,MV_TXG)
-j <- sol["inds"] %>% unlist()
-df_3[j,"MV"] <- "MV" 
+colSums(df["....1"])
