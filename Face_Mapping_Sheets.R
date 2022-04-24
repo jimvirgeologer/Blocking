@@ -5,6 +5,7 @@ library(writexl)
 library(adagio)
 library(dplyr)
 library(MASS)
+library(visdat)
 ###########DATA BASE###############
 setwd("~/current work/01_R_Projects/02_Blocking/FC_SHEETS")
 file.list <- list.files(getwd(),pattern='.xls', recursive = TRUE)
@@ -33,7 +34,7 @@ Face_Sheet <- function(i){
                         LEVEL = as.numeric(c15),
                         FROM = round(as.numeric(c2),2),
                         TO = round(as.numeric(c3),2),
-                        LENGTH = as.numeric(c4),
+                        LENGTH = round(as.numeric(c4),10),
                         AU_gpt = as.numeric(c6),
                         AG_gpt = round(as.numeric(c7),2),
                         CU_perc = round(as.numeric (c8),2),
@@ -45,25 +46,72 @@ Face_Sheet <- function(i){
       !is.na(FROM),
       W_AU !=0)
   
-  
 S <- as.integer(unlist(x["W_AU"] * 10000))
-t <- as.integer(MV_TXG * 10000 )
+t <- (MV_TXG * 10000)
+# 
 
 t <- ifelse(t <= 0 ,2, t) %>% as.integer()
 S <- ifelse(S > t , t - 1, S) %>% as.integer()
 S <- ifelse(S <1 , 1, S) %>% as.integer()
+
   
-########## Sub set sum #############
+# 
+
+# which <- which.max(unlist(x["W_AU"] %% 1))
+# S[which]<- S[which] + 1
+
+
+subsum <- function(b,c) {
+  sol <- subsetsum(b,c)
+  sol$inds
+  
+}
+
+subsum2 <- function(f,g,h) {
+  which <- which.max(unlist(f["W_AU"] %% 1))
+  g[which]<- g[which] + 1
+  sol <- subsetsum(g,h)
+  sol$inds
+  
+}
+
+
+
+# x[,"MV"] <- "PAWER"
+# result <- subsum2(x,S,t)
+
+
+
 # sol <- subsetsum(S,t)
-# j <- sol["inds"] %>% unlist()
+# j <- sol$inds
 # x[j,"MV"] <- "MV"
+
+
+
+
+######### Sub set sum #############
+T <- try(subsum(S,t),silent = T)
+result <- T
+
+
+if (inherits(T, "try-error")) {subsum2(x,S,t)}
+
+x[result,"MV"] <- "MV"
+
+# 
+# result <- subsum2(x,S,t)
+# 
+# x[result,"MV"] <- "MV"
 
 ######### Return Vaues ########
 a <- is.integer(S) %>% as.data.frame()
 b <- is.integer(t) %>% as.data.frame()
-d <-  S < t
+d <-  S <= t
 S <- S %>% as.data.frame()
+# wew <- wew %>% as.data.frame()
 final <- cbind(S,a,t,b,d,x)
+
+
 return(final)
 
 }
@@ -76,4 +124,12 @@ as.data.frame()
 
 vis_miss(df)
 
+
+
+# df_2 <- df %>% transmute(S = as.integer(....1))
+
+
 colSums(df["....1"])
+colSums(df["W_AU"])
+
+
