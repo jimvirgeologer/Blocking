@@ -6,6 +6,7 @@ library(adagio)
 library(dplyr)
 library(MASS)
 library(visdat)
+library(Rmpfr)
 ###########DATA BASE###############
 setwd("~/current work/01_R_Projects/02_Blocking/FC_SHEETS")
 file.list <- list.files(getwd(),pattern='.xls', recursive = TRUE)
@@ -34,19 +35,37 @@ Face_Sheet <- function(i){
                         LEVEL = as.numeric(c15),
                         FROM = round(as.numeric(c2),2),
                         TO = round(as.numeric(c3),2),
-                        LENGTH = round(as.numeric(c4),10),
-                        AU_gpt = as.numeric(c6),
+                        LENGTH = round(as.numeric(c4),16),
+                        AU_gpt = round(as.numeric(c6),16),
                         AG_gpt = round(as.numeric(c7),2),
                         CU_perc = round(as.numeric (c8),2),
                         PB_perc = round(as.numeric(c9),2),
                         ZN_perc = round(as.numeric (c10),2),
-                        W_AU = AU_gpt * LENGTH,
+                        W_AU = round(AU_gpt * LENGTH,16),
+                        # W_AU = mpfr(W_AU,16), 
                         MV = as.character(NA)) %>%
     filter(!is.na(W_AU),
       !is.na(FROM),
       W_AU !=0)
   
-S <- as.integer(unlist(x["W_AU"] * 10000))
+  
+  
+
+########### Solution ###############333
+sol1 <- mpfr(x$W_AU,52)
+sol1 <- round(sol1,digits = 15)
+sol2 <- sol1 %>% as.numeric() * 10000
+sol2 <- as.integer(sol2)
+
+############ Solution
+
+
+
+S <- sol2
+  
+  
+  
+# S <- as.integer(unlist(x["W_AU"] * 10000))
 t <- (MV_TXG * 10000)
 # 
 
@@ -55,10 +74,7 @@ S <- ifelse(S > t , t - 1, S) %>% as.integer()
 S <- ifelse(S <1 , 1, S) %>% as.integer()
 
   
-# 
-
-# which <- which.max(unlist(x["W_AU"] %% 1))
-# S[which]<- S[which] + 1
+#
 
 
 subsum <- function(b,c) {
@@ -77,14 +93,8 @@ subsum2 <- function(f,g,h) {
 
 
 
-# x[,"MV"] <- "PAWER"
-# result <- subsum2(x,S,t)
 
 
-
-# sol <- subsetsum(S,t)
-# j <- sol$inds
-# x[j,"MV"] <- "MV"
 
 
 
@@ -98,21 +108,22 @@ if (inherits(T, "try-error")) {subsum2(x,S,t)}
 
 x[result,"MV"] <- "MV"
 
-# 
-# result <- subsum2(x,S,t)
-# 
-# x[result,"MV"] <- "MV"
+
+
+
+
 
 ######### Return Vaues ########
 a <- is.integer(S) %>% as.data.frame()
 b <- is.integer(t) %>% as.data.frame()
 d <-  S <= t
 S <- S %>% as.data.frame()
-# wew <- wew %>% as.data.frame()
+sol2<- sol2%>% as.data.frame()
+sol2 <-cbind(S,sol2,a,t,b,d,x)
 final <- cbind(S,a,t,b,d,x)
 
 
-return(final)
+return(sol2)
 
 }
 
@@ -129,7 +140,5 @@ vis_miss(df)
 # df_2 <- df %>% transmute(S = as.integer(....1))
 
 
-colSums(df["....1"])
-colSums(df["W_AU"])
 
 
