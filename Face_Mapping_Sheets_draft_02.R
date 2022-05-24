@@ -85,7 +85,7 @@ face_sheet_read <- function(i) {
     # S <- sol2 %>% zapsmall(10)
   
   
-  # t <- ifelse(t <= 0 , 2, t) %>% as.integer()
+  t <- ifelse(t <= 0 , 2, t) %>% as.integer()
   S <- ifelse(S > t , t - 1, S) %>% as.integer()
   # S <- ifelse(S < 1 , 1, S) %>% as.integer()
   
