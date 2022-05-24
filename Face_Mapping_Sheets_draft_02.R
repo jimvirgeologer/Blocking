@@ -8,7 +8,7 @@ library(MASS)
 library(visdat)
 library(Rmpfr)
 ###########DATA BASE###############
-setwd("~/current work/01_R_Projects/02_Blocking/Blocking/FC_SHEETS")
+setwd("~/Current Work/Blocking_R_Project_01/Blocking/FC_SHEETS")
 file.list <- list.files(getwd(), pattern = '.xls', recursive = TRUE)
 file.list <- file.list[!grepl("000", file.list)]
 
@@ -89,19 +89,19 @@ face_sheet_read <- function(i) {
   S <- ifelse(S > t , t - 1, S) %>% as.integer()
   # S <- ifelse(S < 1 , 1, S) %>% as.integer()
   
-  subsum <- function(b, c) {
-    sol <- subsetsum(b, c)
-    sol$inds
-  }
-  
-  wew <- subsum(S,t)
-#  
+#   subsum <- function(b, c) {
+#     sol <- subsetsum(b, c)
+#     sol$inds
+#   }
 #   
-#  # wew <- try(subsum(S, t), silent = T)
-  result <- wew
-# 
-# 
-x[result, "MV"] <- "MV"
+#   wew <- subsum(S,t)
+# #  
+# #   
+# #  # wew <- try(subsum(S, t), silent = T)
+#   result <- wew
+# # 
+# # 
+# x[result, "MV"] <- "MV"
   
   # 
   final <- cbind(x,t,S)
