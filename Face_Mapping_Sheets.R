@@ -74,22 +74,17 @@ face_sheet_read <- function(i) {
   ) %>%
     filter(!is.na(W_AU),!is.na(FROM),
            W_AU != 0)
+x$SHEET <- gsub("FC_","",as.character(x$SHEET))
   
-  
-  ############ Solution 2
-  # sol3 <- mpfr(x$W_AU, 128) %>% round(digits = 15) %>% "*" (10000) %>% as.integer()
+
   sol3 <- x$W_AU * 30000 %>% round(digits = 15)
   S <- sol3 %>% zapsmall(1)
-  # sol1 <- mpfr(x$W_AU, 128) ### 52
-  # sol1 <- round(sol1, digits = 15)
-  # sol2 <- as.integer(sol1 * 10000)
-  
-    # S <- sol2 %>% zapsmall(10)
+
   
   
   t <- ifelse(t <= 0 , 2, t) %>% as.integer()
   S <- ifelse(S > t , t - 1, S) %>% as.integer()
-  # S <- ifelse(S < 1 , 1, S) %>% as.integer()
+
   
   subsum <- function(b, c) {
     sol <- subsetsum(b, c)
