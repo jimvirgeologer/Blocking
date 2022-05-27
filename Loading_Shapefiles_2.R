@@ -3,11 +3,10 @@ library(sf)
 library(tidyverse)
 library(dplyr)
 library(ggplot2)
-
 library(plotly)
 
 ############ INPUT FACE MAPPING SHEETS ###############  
-setwd("~/Current Work/Blocking_R_Project_01/Blocking/Face_Maps")
+setwd("~/current work/01_R_Projects/02_Blocking/Blocking/Face_Maps")
 file.list_gis <- list.files(getwd(), pattern = '.xlsx', recursive = TRUE)
 file.list_gis <- file.list_gis[!grepl("~", file.list_gis)]
 
@@ -57,7 +56,7 @@ face_map_plot<- st_as_sf(df_joined , coords = c("LOCATIONX", "LOCATIONY"), crs =
 ggplot(data = face_map_plot) + geom_sf()
 ############ INPUT SHAPEFILE POSITION LINES ###############  
 
-setwd("~/Current Work/Blocking_R_Project_01/Blocking/Shapefiles")
+setwd("~/current work/01_R_Projects/02_Blocking/Blocking/Shapefiles")
 POS_LINES <- st_read(
   "N_S_Positions.shp")
 POS_LINES<- POS_LINES[,-c(1:2)]
