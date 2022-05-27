@@ -7,18 +7,50 @@ library(ggplot2)
 library(plotly)
 
 ############ INPUT FACE MAPPING SHEETS ###############  
-setwd("~/current work/01_R_Projects/02_Blocking")
+setwd("~/Current Work/Blocking_R_Project_01/Blocking/Face_Maps")
+file.list_gis <- list.files(getwd(), pattern = '.xlsx', recursive = TRUE)
+file.list_gis <- file.list_gis[!grepl("~", file.list_gis)]
 
-face_map <- read_excel("Face_Maps/515_SDNS_90S.xlsx")
-face_map <- face_map %>% filter(!is.na(LOCATIONX),
-                                !is.na(LOCATIONY))
-face_map_2 <- read_excel("Face_Maps/515_SDN_80S.xlsx")
-face_map_2 <- face_map_2 %>% filter(!is.na(LOCATIONX),
-                                !is.na(LOCATIONY))
+face_map_gis<- function(i) {
+  x = read_xlsx(i,sheet = 1)
+  colnames(x) <-
+    c(
+      "c1",
+      "c2",
+      "c3",
+      "c4",
+      "c5",
+      "c6",
+      "c7",
+      "c8",
+      "c9",
+      "c10",
+      "c11"
+    )
+  x <- x %>% transmute(
+    HOLE_ID = as.character(c1),
+    LOCATIONX = as.numeric(c2),
+    LOCATIONY = as.numeric(c3),
+    LOCATIONZ = as.numeric(c4),
+    LENGTH = as.numeric(c5),
+    LEVEL = as.numeric(c6),
+    AREA = as.character(c7),
+    ROCKCODE = as.character(c8),
+    SAMP_BY = as.character(c9),
+    DATE_SAMP = as.Date(c10),
+    TENEMENT = as.character(c11)) %>%
+    filter(!is.na(HOLE_ID))
+} 
+
+
+df_gis <- lapply(file.list_gis, face_map_gis) %>%
+  bind_rows %>%
+  as.data.frame()
+
 
 face_map <- rbind(face_map,face_map_2)
 face_map_plot<- st_as_sf(face_map , coords = c("LOCATIONX", "LOCATIONY"), crs = 3125)
-ggplot(data = face_map_plot) +geom_sf()
+ggplot(data = face_map_plot) + geom_sf()
 ############ INPUT SHAPEFILE POSITION LINES ###############  
 
 POS_LINES <- st_read(

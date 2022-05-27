@@ -70,7 +70,6 @@ face_sheet_read <- function(i) {
     PB_perc = round(as.numeric(c9), 2),
     ZN_perc = round(as.numeric (c10), 2),
     W_AU = round(AU_gpt * LENGTH, 16),
-    # W_AU = mpfr(W_AU,16),
     MV = as.character(NA)
   ) %>%
     filter(!is.na(W_AU),!is.na(FROM),
@@ -105,10 +104,7 @@ x[result, "MV"] <- "MV"
 
   final <- cbind(x,t,S)
   return(final)
-  
 }
-
-
 
 df <- lapply(file.list, face_sheet_read ) %>%
   bind_rows %>%
