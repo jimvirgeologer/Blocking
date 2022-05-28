@@ -95,10 +95,11 @@ face_map_names <- cbind(face_map_names, st_coordinates(st_centroid(face_map_plot
 POS_FACE_MAP <- st_intersection(POS_LINES,face_map_plot)
 
 POS_FACE_MAP_PLOT <- ggplot(data = POS_FACE_MAP, aes(color = AREA)) +
-  geom_sf() +
- geom_text(data = face_map_names, aes(x = X, y = Y, label = SHEET, colour = "blue"))
+  geom_sf()
+  
+ # geom_text(data = face_map_names, aes(x = X, y = Y, label = SHEET, colour = "blue"))
 
-ggplotly(POS_FACE_MAP_PLOT)
+ggplotly(POS_FACE_MAP_PLOT,tooltip = SHEET)
 
 
 ############## Compositing per block ##############33
