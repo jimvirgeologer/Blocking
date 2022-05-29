@@ -9,10 +9,6 @@ library(visdat)
 library(Rmpfr)
 
 
-setwd("~/current work/01_R_Projects/02_Blocking/Blocking")
-
-file.list_gis <- list.files(path = './Face_Maps', pattern = '.xlsx', recursive = TRUE)
-file.list_gis2 <- file.list_gis[!grepl("~", file.list_gis)]
 
 ###########DATA BASE###############
 setwd("~/current work/01_R_Projects/02_Blocking/Blocking")
@@ -55,11 +51,11 @@ face_sheet_read <- function(i) {
   
   
   
-########## MV_TXG ############
+  ########## MV_TXG ############
   MV_TXG <- as.numeric(x[28, 3]) * as.numeric(x[28, 5])
   t <- (MV_TXG * 30000) %>% zapsmall(10)
   
-########### Transmuting x (database) #########
+  ########### Transmuting x (database) #########
   x <- x %>% transmute(
     SHEET = as.character(c14),
     DATE = as.numeric(c16),
@@ -75,43 +71,84 @@ face_sheet_read <- function(i) {
     PB_perc = round(as.numeric(c9), 2),
     ZN_perc = round(as.numeric (c10), 2),
     W_AU = round(AU_gpt * LENGTH, 16),
-    MV = as.character(NA)
+    MV = as.character("WALLROCK")
   ) %>%
     filter(!is.na(W_AU),!is.na(FROM),
            W_AU != 0)
   
-x$SHEET <- gsub("FC_","",as.character(x$SHEET)) ######### Removing FC in names ########
+  x$SHEET <- gsub("FC_","",as.character(x$SHEET)) ######### Removing FC in names ########
   
-
+  
   sol3 <- x$W_AU * 30000 %>% round(digits = 15)
   S <- sol3 %>% zapsmall(1)
-
+  
   
   t <- ifelse(t <= 0 , 2, t) %>% as.integer()
   S <- ifelse(S > t , t - 1, S) %>% as.integer()
-
-########## Subsum ###############3
+  
+  ########## Subsum ###############3
   subsum <- function(b, c) {
     sol <- subsetsum(b, c)
     sol$inds
   }
-
+  
   MV_loc<- subsum(S,t)
   result <- MV_loc
   x[result, "MV"] <- "MV"
+  
+  
+  
+  ################### Vein Parameters #########
+  floating <- "FW"
+  
+  for (i in 1:nrow(x)) {
+    x[i,14] <- if(x[i,14] == "WALLROCK") {
+      floating
+    } else if (x[i,14] == "MV") {
+      "MV"
+    }
+    
+  floating <- if(x[i,14] == "WALLROCK") {
+      "FW"
+    } else if (x[i,14] == "MV") {
+      "HW"
+    }
+    
+    
+  }
+  
+  
+  
+  
+  
+# floating <- "FW"
+#   
+#   MV_VAL <- function(i) {
+#             if(i == "WALLROCK") {
+#               floating
+#             } else if (i == "MV") {
+#              i <- "MV"
+#              floating = "mark" 
+#             }
+#   }
+#   
+#   
+# x$MV <- lapply(x$MV,MV_VAL)
 
-############### Binding#
-  final <- cbind(x,t,S)
+
+
+  
+  
+x <- x %>% mutate(LEN_AU = LENGTH * AU_gpt)
+  
+  
+  
+  ############### Binding##############
+  final <- cbind(x)
   return(final)
 }
 
 ######## Applying function to all in the file.list ############
-df <- lapply(file.list, face_sheet_read) %>%
+df_trial <- lapply(file.list[1:15], face_sheet_read) %>%
   bind_rows %>%
   as.data.frame()
-
-
-
-######### Counting how many MVs ##########
-df %>% count(MV)
-

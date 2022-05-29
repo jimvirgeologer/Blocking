@@ -7,8 +7,11 @@ library(ggplot2)
 library(plotly)
 
 ############ INPUT FACE MAPPING SHEETS ###############  
-setwd("~/Current Work/Blocking_R_Project_01/Blocking/Face_Maps")
-file.list_gis <- list.files(getwd(), pattern = '.xlsx', recursive = TRUE)
+# setwd("~/current work/01_R_Projects/02_Blocking/Blocking/Face_Maps")
+
+setwd("~/current work/01_R_Projects/02_Blocking/Blocking")
+
+file.list_gis <- list.files(path = './Face_Maps', pattern = '.xlsx', recursive = TRUE, full.names = TRUE)
 file.list_gis <- file.list_gis[!grepl("~", file.list_gis)]
 
 face_map_gis<- function(i) {
@@ -57,9 +60,8 @@ face_map_plot<- st_as_sf(df_joined , coords = c("LOCATIONX", "LOCATIONY"), crs =
 ggplot(data = face_map_plot) + geom_sf()
 ############ INPUT SHAPEFILE POSITION LINES ###############  
 
-setwd("~/Current Work/Blocking_R_Project_01/Blocking/Shapefiles")
 POS_LINES <- st_read(
-  "N_S_Positions.shp")
+  "./Shapefiles/N_S_Positions.shp")
 POS_LINES<- POS_LINES[,-c(1:2)]
 POS_LINES_PLOT <- ggplot() + 
   geom_sf(data = POS_LINES, size = 0.1, color = "cyan") + 
@@ -94,12 +96,12 @@ face_map_names <- cbind(face_map_names, st_coordinates(st_centroid(face_map_plot
 
 POS_FACE_MAP <- st_intersection(POS_LINES,face_map_plot)
 
-POS_FACE_MAP_PLOT <- ggplot(data = POS_FACE_MAP, aes(color = AREA)) +
+POS_FACE_MAP_PLOT <- ggplot(data = POS_FACE_MAP, aes(color = AREA, text = SHEET)) +
   geom_sf()
   
  # geom_text(data = face_map_names, aes(x = X, y = Y, label = SHEET, colour = "blue"))
 
-ggplotly(POS_FACE_MAP_PLOT,tooltip = SHEET)
+ggplotly(POS_FACE_MAP_PLOT,tooltip = "text")
 
 
 ############## Compositing per block ##############33

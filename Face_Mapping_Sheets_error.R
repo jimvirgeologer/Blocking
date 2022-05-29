@@ -8,7 +8,7 @@
   library(visdat)
   library(Rmpfr)
   ###########DATA BASE###############
-  setwd("~/current work/01_R_Projects/02_Blocking/FC_SHEETS")
+  setwd("~/current work/01_R_Projects/02_Blocking/Blocking/FC_SHEETS")
   file.list <- list.files(getwd(),pattern='.xls', recursive = TRUE)
   file.list <- file.list[!grepl("000",file.list)]
   
