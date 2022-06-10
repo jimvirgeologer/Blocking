@@ -137,11 +137,19 @@ face_sheet_read <- function(i) {
 
 
 
+
+
+x <- x %>% mutate(AU_gpt_2= ifelse(AU_gpt >25, 25, AU_gpt),
+                                      LEN_AU = LENGTH * AU_gpt_2)
+
+
+x <- x %>% group_by(SHEET,MV) %>% summarize(LENGTH = sum(LENGTH),
+                                AU_gpt = sum(LEN_AU)/sum(LENGTH))
+MV_L <-dplyr::select(filter(x, MV == "MV"), LENGTH)
+
+WL_L <- (3- MV_L[[2]] )/ 2
   
-  
-x <- x %>% mutate(LEN_AU = LENGTH * AU_gpt)
-  
-  
+x$Block <- (MV_L[[2]] * x[3,4] + WL_L * x[1,4] + WL_L * x[2,4] )/3
   
   ############### Binding##############
   final <- cbind(x)

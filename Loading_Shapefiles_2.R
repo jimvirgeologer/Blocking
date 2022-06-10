@@ -3,9 +3,8 @@ library(sf)
 library(tidyverse)
 library(dplyr)
 library(ggplot2)
-
 library(plotly)
-
+library(visdat)
 ############ INPUT FACE MAPPING SHEETS ###############  
 # setwd("~/current work/01_R_Projects/02_Blocking/Blocking/Face_Maps")
 
@@ -49,6 +48,7 @@ face_map_gis<- function(i) {
 df_gis <- lapply(file.list_gis, face_map_gis) %>%
   bind_rows %>%
   as.data.frame()
+df <- df %>% mutate(file = "MINE GEO")
 
 ########### joining table ###########
 df_joined <- full_join(df,df_gis,by = c("SHEET" = "HOLE_ID"))
@@ -96,7 +96,7 @@ face_map_names <- cbind(face_map_names, st_coordinates(st_centroid(face_map_plot
 
 POS_FACE_MAP <- st_intersection(POS_LINES,face_map_plot)
 
-POS_FACE_MAP_PLOT <- ggplot(data = POS_FACE_MAP, aes(color = AREA, text = SHEET)) +
+POS_FACE_MAP_PLOT <- ggplot(data = POS_FACE_MAP, aes(color = file, text = SHEET)) +
   geom_sf()
   
  # geom_text(data = face_map_names, aes(x = X, y = Y, label = SHEET, colour = "blue"))

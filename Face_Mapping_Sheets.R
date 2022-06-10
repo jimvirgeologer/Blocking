@@ -9,16 +9,13 @@ library(visdat)
 library(Rmpfr)
 
 
-setwd("~/current work/01_R_Projects/02_Blocking/Blocking")
 
-file.list_gis <- list.files(path = './Face_Maps', pattern = '.xlsx', recursive = TRUE)
-file.list_gis2 <- file.list_gis[!grepl("~", file.list_gis)]
+
 
 ###########DATA BASE###############
 setwd("~/current work/01_R_Projects/02_Blocking/Blocking")
 file.list <- list.files(path = './FC_SHEETS', pattern = '.xls', recursive = TRUE, full.names = TRUE)
 file.list <- file.list[!grepl("000", file.list)]
-
 
 
 ########### Simple Read Excel ############ 
@@ -59,7 +56,7 @@ face_sheet_read <- function(i) {
   MV_TXG <- as.numeric(x[28, 3]) * as.numeric(x[28, 5])
   t <- (MV_TXG * 30000) %>% zapsmall(10)
   
-########### Transmuting x (database) #########
+  
   x <- x %>% transmute(
     SHEET = as.character(c14),
     DATE = as.numeric(c16),
@@ -79,39 +76,36 @@ face_sheet_read <- function(i) {
   ) %>%
     filter(!is.na(W_AU),!is.na(FROM),
            W_AU != 0)
-  
-x$SHEET <- gsub("FC_","",as.character(x$SHEET)) ######### Removing FC in names ########
+x$SHEET <- gsub("FC_","",as.character(x$SHEET))
   
 
   sol3 <- x$W_AU * 30000 %>% round(digits = 15)
   S <- sol3 %>% zapsmall(1)
 
   
+  
   t <- ifelse(t <= 0 , 2, t) %>% as.integer()
   S <- ifelse(S > t , t - 1, S) %>% as.integer()
 
-########## Subsum ###############3
+  
   subsum <- function(b, c) {
     sol <- subsetsum(b, c)
     sol$inds
   }
 
-  MV_loc<- subsum(S,t)
-  result <- MV_loc
-  x[result, "MV"] <- "MV"
+  wew <- subsum(S,t)
 
-############### Binding#
+  result <- wew
+
+x[result, "MV"] <- "MV"
+
   final <- cbind(x,t,S)
   return(final)
 }
 
-######## Applying function to all in the file.list ############
-df <- lapply(file.list, face_sheet_read) %>%
+df <- lapply(file.list, face_sheet_read ) %>%
   bind_rows %>%
   as.data.frame()
 
 
-
-######### Counting how many MVs ##########
 df %>% count(MV)
-
