@@ -4,13 +4,18 @@ library(tidyverse)
 library(dplyr)
 library(ggplot2)
 library(plotly)
-library(visdat)
+
 ############ INPUT FACE MAPPING SHEETS ###############  
+
+setwd("~/current work/01_R_Projects/02_Blocking/Blocking/Face_Maps")
+file.list_gis <- list.files(getwd(), pattern = '.xlsx', recursive = TRUE)
+=======
 # setwd("~/current work/01_R_Projects/02_Blocking/Blocking/Face_Maps")
 
 setwd("~/current work/01_R_Projects/02_Blocking/Blocking")
 
 file.list_gis <- list.files(path = './Face_Maps', pattern = '.xlsx', recursive = TRUE, full.names = TRUE)
+
 file.list_gis <- file.list_gis[!grepl("~", file.list_gis)]
 
 face_map_gis<- function(i) {
@@ -48,7 +53,6 @@ face_map_gis<- function(i) {
 df_gis <- lapply(file.list_gis, face_map_gis) %>%
   bind_rows %>%
   as.data.frame()
-df <- df %>% mutate(file = "MINE GEO")
 
 ########### joining table ###########
 df_joined <- full_join(df,df_gis,by = c("SHEET" = "HOLE_ID"))
@@ -60,6 +64,10 @@ face_map_plot<- st_as_sf(df_joined , coords = c("LOCATIONX", "LOCATIONY"), crs =
 ggplot(data = face_map_plot) + geom_sf()
 ############ INPUT SHAPEFILE POSITION LINES ###############  
 
+<<<<<<< HEAD
+setwd("~/current work/01_R_Projects/02_Blocking/Blocking/Shapefiles")
+=======
+>>>>>>> c4c7b06 (completed compositing)
 POS_LINES <- st_read(
   "./Shapefiles/N_S_Positions.shp")
 POS_LINES<- POS_LINES[,-c(1:2)]
@@ -96,7 +104,7 @@ face_map_names <- cbind(face_map_names, st_coordinates(st_centroid(face_map_plot
 
 POS_FACE_MAP <- st_intersection(POS_LINES,face_map_plot)
 
-POS_FACE_MAP_PLOT <- ggplot(data = POS_FACE_MAP, aes(color = file, text = SHEET)) +
+POS_FACE_MAP_PLOT <- ggplot(data = POS_FACE_MAP, aes(color = AREA, text = POS_N_S)) +
   geom_sf()
   
  # geom_text(data = face_map_names, aes(x = X, y = Y, label = SHEET, colour = "blue"))
@@ -107,15 +115,22 @@ ggplotly(POS_FACE_MAP_PLOT,tooltip = "text")
 ############## Compositing per block ##############33
 
 POS_FACE_MAP_AVERAGE <- POS_FACE_MAP %>%
-  group_by(POS_N_S, AREA, LEVEL) %>% 
-  summarize(LENGTH = mean(LENGTH)
-            )
+  mutate(LEN_AU = LENGTH.x * AU_gpt) %>%
+  group_by(POS_N_S, AREA, LEVEL.x) %>% 
+  summarize(AVE= sum(LEN_AU)/sum(LENGTH.x)) %>% mutate(AVE = signif(AVE,3))
 
 
 
 
 
+POS_FACE_MAP_PLOT_2 <- ggplot(data = POS_FACE_MAP_AVERAGE , aes(color = AVE, text = POS_N_S)) +
+  geom_sf()
+ggplotly(POS_FACE_MAP_PLOT_2,tooltip = "text")
 
+
+pawer <- POS_FACE_MAP_AVERAGE %>% filter(AREA == "SDN4") %>% ggplot(aes(x = POS_N_S, y = LEVEL.x, label = AVE)) + geom_point() + geom_text(hjust = 0, vjust = 0)
+
+ggplotly(pawer)
 
 
 
