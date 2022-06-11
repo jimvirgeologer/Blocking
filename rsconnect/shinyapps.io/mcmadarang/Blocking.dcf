@@ -5,9 +5,19 @@ account: mcmadarang
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 6383837
+<<<<<<< HEAD
 bundleId: 5956160
 url: https://mcmadarang.shinyapps.io/Blocking/
 when: 1653797581.51581
 lastSyncTime: 1653797581.51581
 asMultiple: FALSE
 asStatic: FALSE
+=======
+bundleId: 5951350
+url: https://mcmadarang.shinyapps.io/Blocking/
+when: 1653655892.30421
+lastSyncTime: 1653655892.30421
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: .RData|Correlation Matrix.R|face_mapping_finder/app.R|Face_Mapping_Sheets.R|Face_Mapping_Sheets_draft_01.R|Face_Mapping_Sheets_draft_02.R|Face_Mapping_Sheets_draft_03.R|Face_Mapping_Sheets_error.R|Loading_Shapefiles.R|Loading_Shapefiles_2.R|the minus 1 problem.R|tired.R|Trash/R_Spatial_Tutorial.R|trash.R|Trial.R|Web_app/app.R|Face_Maps|FC_SHEETS|Shapefiles
+>>>>>>> 31ab53ec96c9b41bba2cec09e0cc1cd78fdbe049

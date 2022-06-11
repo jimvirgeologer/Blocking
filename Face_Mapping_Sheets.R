@@ -9,6 +9,13 @@ library(visdat)
 library(Rmpfr)
 
 
+<<<<<<< HEAD
+=======
+###########DATA BASE###############
+setwd("~/current work/01_R_Projects/02_Blocking/Blocking/FC_SHEETS")
+file.list <- list.files(getwd(), pattern = '.xls', recursive = TRUE)
+file.list <- file.list[!grepl("000", file.list)]
+>>>>>>> 31ab53ec96c9b41bba2cec09e0cc1cd78fdbe049
 
 
 
@@ -109,3 +116,4 @@ df <- lapply(file.list, face_sheet_read ) %>%
 
 
 df %>% count(MV)
+

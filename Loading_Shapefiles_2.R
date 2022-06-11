@@ -6,7 +6,10 @@ library(ggplot2)
 library(plotly)
 
 ############ INPUT FACE MAPPING SHEETS ###############  
+<<<<<<< HEAD
 
+=======
+>>>>>>> 31ab53ec96c9b41bba2cec09e0cc1cd78fdbe049
 setwd("~/current work/01_R_Projects/02_Blocking/Blocking/Face_Maps")
 file.list_gis <- list.files(getwd(), pattern = '.xlsx', recursive = TRUE)
 =======
@@ -65,9 +68,13 @@ ggplot(data = face_map_plot) + geom_sf()
 ############ INPUT SHAPEFILE POSITION LINES ###############  
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 setwd("~/current work/01_R_Projects/02_Blocking/Blocking/Shapefiles")
 =======
 >>>>>>> c4c7b06 (completed compositing)
+=======
+setwd("~/current work/01_R_Projects/02_Blocking/Blocking/Shapefiles")
+>>>>>>> 31ab53ec96c9b41bba2cec09e0cc1cd78fdbe049
 POS_LINES <- st_read(
   "./Shapefiles/N_S_Positions.shp")
 POS_LINES<- POS_LINES[,-c(1:2)]
